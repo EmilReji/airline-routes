@@ -1,10 +1,21 @@
 import React, { Component } from 'react';
-import data from './data.js';
+import Table from './components/Table.js';
 
 import './App.css';
 
+function formatValue(property, value) { 
+  // return a string
+}
+
 class App extends Component {
   render() {
+    const columns = [
+      {name: 'Airline', property: 'airline'},
+      {name: 'Source Airport', property: 'src'},
+      {name: 'Destination Airport', property: 'dest'},
+    ];
+
+
     return (
       <div className="app">
         <header className="header">
@@ -16,27 +27,7 @@ class App extends Component {
           </p>
         </section>
         <section>
-          <table>
-            <thead>
-              <tr>
-                <th>Airline</th>
-                <th>Source</th>
-                <th>Destination</th>
-              </tr>
-            </thead>
-            <tbody>
-              { 
-                data.routes.map((route, idx) => (
-                <tr key={idx}>
-                  <td>{data.getAirlineById(route.airline).name}</td>
-                  <td>{data.getAirportByCode(route.src).name}</td>
-                  <td>{data.getAirportByCode(route.dest).name}</td>
-                </tr>
-                ))
-              } 
-            </tbody>
-          </table>
-
+          <Table className="routes-table" columns={columns} rows="" format="" />
         </section>
       </div>
     );
