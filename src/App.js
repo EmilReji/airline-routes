@@ -27,7 +27,7 @@ class App extends Component {
           </p>
         </section>
         <section>
-          <Table className="routes-table" columns={columns} rows="" format="" />
+          <Table className="routes-table" columns={columns} perPage={25} rows="" format={formatValue} />
         </section>
       </div>
     );
