@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import data from '../data.js';
+import Select from './Select.js';
 
 class Table extends Component {
   state = {
@@ -96,12 +97,7 @@ class Table extends Component {
 
     return (
     <section>
-      <select onChange={this.airlineChanged}>
-        <option>All Airlines</option>
-        {data.airlines.map(airline => (
-          <option key={airline.id}>{airline.name}</option>
-        ))} 
-      </select>
+      <Select airlines={data.airlines} onSelect={this.airlineChanged} valueKey="id" titleKey="name" allTitle="All Airlines" value="" />
       <table>
         <thead>
           <tr>
