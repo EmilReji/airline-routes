@@ -13,7 +13,7 @@ class Table extends Component {
 
   componentDidMount(){
     this.setState({ 
-      routes: data.routes.slice(this.state.offset, this.state.offset + this.state.max),
+      routes: data.routes.slice(),
     });
   }
 
@@ -40,10 +40,8 @@ class Table extends Component {
     } else {
       this.enablePrev();
     }
-    console.log(newOffset);
-    console.log(this.state.max);
-    console.log(data.routes.length - 1);
-    if (newOffset + this.state.max > data.routes.length - 1) {
+    
+    if (newOffset + this.state.max > this.state.routes.length - 1) {
       this.disableNext();
     } else {
       this.enableNext();
@@ -59,7 +57,7 @@ class Table extends Component {
       offset: newOffset, 
       routes: data.routes.filter(route => {
         return (this.state.currAirline === "All Airlines" || this.state.currAirline === data.getAirlineById(route.airline).name)
-      }).slice(newOffset, newOffset + this.state.max), 
+      }), 
     });
   }
 
@@ -70,7 +68,7 @@ class Table extends Component {
       offset: newOffset, 
       routes: data.routes.filter(route => {
         return (this.state.currAirline === "All Airlines" || this.state.currAirline === data.getAirlineById(route.airline).name)
-      }).slice(newOffset, newOffset + this.state.max), 
+      }), 
     });
   }
 
@@ -89,11 +87,13 @@ class Table extends Component {
     this.setState({
       routes: data.routes.filter(route => {
         return (airline === "All Airlines" || airline === data.getAirlineById(route.airline).name)
-      }).slice(this.state.offset, this.state.offset + this.state.max),
+      }),
     });
   }
 
   render() {
+    const currRoutes = this.state.routes.slice(this.state.offset, this.state.offset + this.state.max);
+
     return (
     <section>
       <select onChange={this.airlineChanged}>
@@ -112,7 +112,7 @@ class Table extends Component {
         </thead>
         <tbody>
           {
-            this.state.routes.map((route, idx) => (
+            currRoutes.map((route, idx) => (
             <tr key={idx}>
               <td>{data.getAirlineById(route[this.props.columns[0].property]).name}</td>
               <td>{data.getAirportByCode(route[this.props.columns[1].property]).name}</td>
@@ -122,7 +122,7 @@ class Table extends Component {
           }
           <tr>
             <td><button disabled={this.state.prevBtnDisabled} onClick={this.decreaseOffset}>Previous Page</button></td>
-            <td></td>
+            <td>Showing {this.state.offset + 1} - {this.state.offset + this.state.max} of {this.state.routes.length} routes.</td>
             <td><button disabled={this.state.nextBtnDisabled} onClick={this.increaseOffset}>Next Page</button></td>
           </tr>
         </tbody>
