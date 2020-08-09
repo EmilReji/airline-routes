@@ -26,9 +26,7 @@ class App extends Component {
             Welcome to the app!
           </p>
         </section>
-        <section>
-          <Table className="routes-table" columns={columns} perPage={25} rows="" format={formatValue} />
-        </section>
+        <Table className="routes-table" columns={columns} perPage={25} rows="" format={formatValue} />
       </div>
     );
   }

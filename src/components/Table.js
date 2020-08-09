@@ -8,6 +8,7 @@ class Table extends Component {
       routes: [],
       prevBtnDisabled: true,
       nextBtnDisabled: false,
+      currAirline: "All Airlines",
   }
 
   componentDidMount(){
@@ -15,10 +16,6 @@ class Table extends Component {
       routes: data.routes.slice(this.state.offset, this.state.offset + this.state.max),
     });
   }
-
-  /*componentDidUpdate() {
-    console.log(`From ${this.state.offset} to ${this.state.offset + this.state.max}`);
-  }*/
 
   disablePrev() {
     this.setState({ prevBtnDisabled: true });
@@ -39,11 +36,13 @@ class Table extends Component {
   validateOffset(newOffset){
     if (newOffset < this.state.max) {
       newOffset = 0
-      this.disablePrev()
+      this.disablePrev();
     } else {
-      this.enablePrev()
+      this.enablePrev();
     }
-    
+    console.log(newOffset);
+    console.log(this.state.max);
+    console.log(data.routes.length - 1);
     if (newOffset + this.state.max > data.routes.length - 1) {
       this.disableNext();
     } else {
@@ -56,18 +55,53 @@ class Table extends Component {
   decreaseOffset = () => {
     let newOffset = this.state.offset - this.state.max
     newOffset = this.validateOffset(newOffset);
-    this.setState({ offset: newOffset, routes: data.routes.slice(newOffset, newOffset + this.state.max), })
-    
+    this.setState({ 
+      offset: newOffset, 
+      routes: data.routes.filter(route => {
+        return (this.state.currAirline === "All Airlines" || this.state.currAirline === data.getAirlineById(route.airline).name)
+      }).slice(newOffset, newOffset + this.state.max), 
+    });
   }
 
   increaseOffset = () => {
     let newOffset = this.state.offset + this.state.max
     newOffset = this.validateOffset(newOffset); 
-    this.setState({ offset: newOffset, routes: data.routes.slice(newOffset, newOffset + this.state.max), })
+    this.setState({ 
+      offset: newOffset, 
+      routes: data.routes.filter(route => {
+        return (this.state.currAirline === "All Airlines" || this.state.currAirline === data.getAirlineById(route.airline).name)
+      }).slice(newOffset, newOffset + this.state.max), 
+    });
+  }
+
+  airlineChanged = (e) => {
+    e.preventDefault();
+    const airline = e.target.value;
+
+    this.setState({
+      offset: 0,
+      routes: [],
+      prevBtnDisabled: true,
+      nextBtnDisabled: false,
+      currAirline: airline,
+    });
+
+    this.setState({
+      routes: data.routes.filter(route => {
+        return (airline === "All Airlines" || airline === data.getAirlineById(route.airline).name)
+      }).slice(this.state.offset, this.state.offset + this.state.max),
+    });
   }
 
   render() {
     return (
+    <section>
+      <select onChange={this.airlineChanged}>
+        <option>All Airlines</option>
+        {data.airlines.map(airline => (
+          <option key={airline.id}>{airline.name}</option>
+        ))} 
+      </select>
       <table>
         <thead>
           <tr>
@@ -93,6 +127,7 @@ class Table extends Component {
           </tr>
         </tbody>
       </table>
+    </section>
     );
   }
 }
