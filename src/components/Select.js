@@ -3,10 +3,10 @@ import React, { Component } from 'react';
 class Select extends Component {
   render() {
     return (
-      <select onChange={this.props.onSelect}>
+      <select value={this.props.value} onChange={this.props.onSelect}>
         <option>{this.props.allTitle}</option>
-        {this.props.airlines.map(airline => (
-          <option key={airline.id}>{airline.name}</option>
+        {this.props.data.map(obj => (
+          <option key={obj[this.props.valueKey]}>{obj[this.props.titleKey]}</option>
         ))}
       </select>
     )

@@ -8,13 +8,15 @@ class Table extends Component {
       max: this.props.perPage,
       routes: [],
       prevBtnDisabled: true,
-      nextBtnDisabled: false,
+      nextBtnDisabled: true,
       currAirline: "All Airlines",
+      currAirport: "All Airports",
   }
 
   componentDidMount(){
     this.setState({ 
       routes: data.routes.slice(),
+      nextBtnDisabled: false,
     });
   }
 
@@ -47,7 +49,7 @@ class Table extends Component {
     } else {
       this.enableNext();
     }
-    
+
     return newOffset;
   }
 
@@ -57,7 +59,11 @@ class Table extends Component {
     this.setState({ 
       offset: newOffset, 
       routes: data.routes.filter(route => {
-        return (this.state.currAirline === "All Airlines" || this.state.currAirline === data.getAirlineById(route.airline).name)
+        return (this.state.currAirline === "All Airlines" || 
+                this.state.currAirline === data.getAirlineById(route.airline).name) &&
+               (this.state.currAirport === "All Airports" ||
+                this.state.currAirport === data.getAirportByCode(route.src).name ||
+                this.state.currAirport === data.getAirportByCode(route.dest).name)
       }), 
     });
   }
@@ -68,7 +74,11 @@ class Table extends Component {
     this.setState({ 
       offset: newOffset, 
       routes: data.routes.filter(route => {
-        return (this.state.currAirline === "All Airlines" || this.state.currAirline === data.getAirlineById(route.airline).name)
+        return (this.state.currAirline === "All Airlines" || 
+                this.state.currAirline === data.getAirlineById(route.airline).name) &&
+               (this.state.currAirport === "All Airports" ||
+                this.state.currAirport === data.getAirportByCode(route.src).name ||
+                this.state.currAirport === data.getAirportByCode(route.dest).name)
       }), 
     });
   }
@@ -87,17 +97,57 @@ class Table extends Component {
 
     this.setState({
       routes: data.routes.filter(route => {
-        return (airline === "All Airlines" || airline === data.getAirlineById(route.airline).name)
+        return (airline === "All Airlines" || 
+                airline === data.getAirlineById(route.airline).name)
+      }),
+    });
+
+    if (this.state.routes.length < this.state.max) {
+      this.disablePrev();
+      this.disableNext();
+    }
+  }
+
+  airportChanged = (e) => {
+    e.preventDefault();
+    const airport = e.target.value;
+
+    this.setState({
+      offset: 0,
+      routes: [],
+      prevBtnDisabled: true,
+      nextBtnDisabled: false,
+      currAirport: airport,
+    });
+
+    this.setState({
+      routes: data.routes.filter(route => {
+        return (airport === "All Airports" || 
+                airport === data.getAirportByCode(route.src).name || 
+                airport === data.getAirportByCode(route.dest).name)
       }),
     });
   }
 
+  clearFilters = () => {
+    this.setState({
+      currAirline: "All Airlines",
+      currAirport: "All Airports",
+      routes: data.routes.slice(),
+    });
+    
+
+  }
+
   render() {
     const currRoutes = this.state.routes.slice(this.state.offset, this.state.offset + this.state.max);
-
     return (
     <section>
-      <Select airlines={data.airlines} onSelect={this.airlineChanged} valueKey="id" titleKey="name" allTitle="All Airlines" value="" />
+      Show routes on
+      <Select data={data.airlines} valueKey="id" titleKey="name" allTitle="All Airlines" value={this.state.currAirline} onSelect={this.airlineChanged} />
+      flying in or out of
+      <Select data={data.airports} valueKey="code" titleKey="name" allTitle="All Airports" value={this.state.currAirport} onSelect={this.airportChanged} />
+      <button onClick={this.clearFilters}>Show All Routes</button>
       <table>
         <thead>
           <tr>
