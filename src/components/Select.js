@@ -6,7 +6,7 @@ class Select extends Component {
       <select value={this.props.value} onChange={this.props.onSelect}>
         <option>{this.props.allTitle}</option>
         {this.props.data.map(obj => (
-          <option key={obj[this.props.valueKey]}>{obj[this.props.titleKey]}</option>
+          <option disabled={!this.props.matchingData[obj[this.props.valueKey]]} key={obj[this.props.valueKey]}>{obj[this.props.titleKey]}</option>
         ))}
       </select>
     )

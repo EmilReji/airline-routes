@@ -97,8 +97,11 @@ class Table extends Component {
 
     this.setState({
       routes: data.routes.filter(route => {
-        return (airline === "All Airlines" || 
-                airline === data.getAirlineById(route.airline).name)
+        return ((airline === "All Airlines" || 
+                airline === data.getAirlineById(route.airline).name) &&
+               (this.state.currAirport === "All Airports" ||
+                this.state.currAirport === data.getAirportByCode(route.src).name ||
+                this.state.currAirport === data.getAirportByCode(route.dest).name))
       }),
     });
 
@@ -124,7 +127,9 @@ class Table extends Component {
       routes: data.routes.filter(route => {
         return (airport === "All Airports" || 
                 airport === data.getAirportByCode(route.src).name || 
-                airport === data.getAirportByCode(route.dest).name)
+                airport === data.getAirportByCode(route.dest).name) &&
+               (this.state.currAirline === "All Airlines" ||
+                this.state.currAirline === data.getAirlineById(route.airline).name)
       }),
     });
   }
@@ -135,18 +140,52 @@ class Table extends Component {
       currAirport: "All Airports",
       routes: data.routes.slice(),
     });
-    
+  }
 
+  getMatchingAirlines = () => {
+    const airlines = {}
+
+    this.state.routes.forEach(route => {
+      if ((this.state.currAirline === "All Airlines" || 
+           this.state.currAirline === data.getAirlineById(route.airline).name) &&
+          (this.state.currAirport === "All Airports" ||
+           this.state.currAirport === data.getAirportByCode(route.src).name ||
+           this.state.currAirport === data.getAirportByCode(route.dest).name)) 
+        {
+          airlines[data.getAirlineById(route.airline).id] = data.getAirlineById(route.airline).name;
+        }
+    }); 
+
+    return airlines
+  }
+
+  getMatchingAirports = () => {
+    const airports = {};
+    
+    this.state.routes.forEach(route => {
+      if ((this.state.currAirline === "All Airlines" ||
+           this.state.currAirline === data.getAirlineById(route.airline).name) &&
+          (this.state.currAirport === "All Airports" ||
+           this.state.currAirport === data.getAirportByCode(route.src).name ||
+           this.state.currAirport === data.getAirportByCode(route.dest).name))     
+        {
+          airports[data.getAirportByCode(route.src).code] = data.getAirportByCode(route.src).name;
+          airports[data.getAirportByCode(route.dest).code] = data.getAirportByCode(route.dest).name;
+        }
+    });
+
+    return airports;
   }
 
   render() {
     const currRoutes = this.state.routes.slice(this.state.offset, this.state.offset + this.state.max);
+    
     return (
     <section>
       Show routes on
-      <Select data={data.airlines} valueKey="id" titleKey="name" allTitle="All Airlines" value={this.state.currAirline} onSelect={this.airlineChanged} />
+      <Select data={data.airlines} matchingData={this.getMatchingAirlines()} valueKey="id" titleKey="name" allTitle="All Airlines" value={this.state.currAirline} onSelect={this.airlineChanged} />
       flying in or out of
-      <Select data={data.airports} valueKey="code" titleKey="name" allTitle="All Airports" value={this.state.currAirport} onSelect={this.airportChanged} />
+      <Select data={data.airports} matchingData={this.getMatchingAirports()} valueKey="code" titleKey="name" allTitle="All Airports" value={this.state.currAirport} onSelect={this.airportChanged} />
       <button onClick={this.clearFilters}>Show All Routes</button>
       <table>
         <thead>
@@ -168,7 +207,7 @@ class Table extends Component {
           }
           <tr>
             <td><button disabled={this.state.prevBtnDisabled} onClick={this.decreaseOffset}>Previous Page</button></td>
-            <td>Showing {this.state.offset + 1} - {this.state.offset + this.state.max} of {this.state.routes.length} routes.</td>
+            <td>Showing {this.state.offset + 1} - {(this.state.routes.length - this.state.offset >= this.state.max) ? (this.state.offset + this.state.max) : this.state.routes.length} of {this.state.routes.length} routes.</td>
             <td><button disabled={this.state.nextBtnDisabled} onClick={this.increaseOffset}>Next Page</button></td>
           </tr>
         </tbody>

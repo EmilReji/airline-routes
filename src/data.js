@@ -1,4 +1,5 @@
 const routes = [
+    {"airline":24,"src":"DFW","dest":"XNA"},
     {"airline":24,"src":"DFW","dest":"XNA"}, 
     {"airline":24,"src":"DFW","dest":"FWA"}, 
     {"airline":24,"src":"TYS","dest":"LGA"}, 
